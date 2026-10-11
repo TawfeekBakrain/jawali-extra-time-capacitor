@@ -1,0 +1,9 @@
+{
+  "appId": "com.jawali.extratime",
+  "appName": "Extra Time",
+  "webDir": "www",
+  "server": {
+    "url": "https://jawali-extra-time-pro.vercel.app/",
+    "cleartext": false
+  }
+}

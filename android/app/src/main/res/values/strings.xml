@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Extra Time</string>
+    <string name="title_activity_main">Extra Time</string>
+    <string name="package_name">com.jawali.extratime</string>
+    <string name="custom_url_scheme">com.jawali.extratime</string>
+</resources>
