@@ -47,6 +47,16 @@ public class MainActivity extends BridgeActivity {
                     WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
                 );
 
+                int support =
+                    WebSettingsCompat.getWebAuthenticationSupport(
+                        webView.getSettings()
+                    );
+
+                android.util.Log.i(
+                    "ExtraTimeWebAuthn",
+                    "WebAuthn support level after configuration: " + support
+                );
+
                 android.util.Log.i(
                     "ExtraTimeWebAuthn",
                     "WebAuthn app support configured; reloading page."
