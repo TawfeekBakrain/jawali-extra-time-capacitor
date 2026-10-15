@@ -1,6 +1,7 @@
 package com.jawali.extratime;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 
 import androidx.webkit.WebSettingsCompat;
@@ -11,6 +12,8 @@ import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
 
+    private static final String TAG = "ExtraTimeWebAuthn";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,41 +21,47 @@ public class MainActivity extends BridgeActivity {
         Bridge bridge = getBridge();
 
         if (bridge == null) {
-            android.util.Log.w(
-                "ExtraTimeWebAuthn",
-                "Capacitor bridge is not ready."
-            );
+            Log.e(TAG, "Capacitor bridge is not ready.");
             return;
         }
 
         WebView webView = bridge.getWebView();
 
         if (webView == null) {
-            android.util.Log.w(
-                "ExtraTimeWebAuthn",
-                "WebView is not available."
-            );
+            Log.e(TAG, "WebView is not available.");
             return;
         }
 
-        if (WebViewFeature.isFeatureSupported(
+        if (!WebViewFeature.isFeatureSupported(
                 WebViewFeature.WEB_AUTHENTICATION)) {
+            Log.e(TAG, "WEB_AUTHENTICATION is not supported by this WebView.");
+            return;
+        }
 
+        try {
             WebSettingsCompat.setWebAuthenticationSupport(
                 webView.getSettings(),
                 WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
             );
 
-            android.util.Log.i(
-                "ExtraTimeWebAuthn",
-                "WebAuthn app support enabled."
+            int support = WebSettingsCompat.getWebAuthenticationSupport(
+                webView.getSettings()
             );
 
-        } else {
-            android.util.Log.w(
-                "ExtraTimeWebAuthn",
-                "This WebView does not support WEB_AUTHENTICATION."
-            );
+            Log.i(TAG, "WebAuthn support level: " + support);
+
+            if (support != WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP) {
+                Log.e(TAG, "WebAuthn app support was not enabled.");
+                return;
+            }
+
+            webView.post(() -> {
+                Log.i(TAG, "Reloading page after WebAuthn initialization.");
+                webView.reload();
+            });
+
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to enable WebAuthn support.", e);
         }
     }
 }
