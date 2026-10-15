@@ -4,6 +4,7 @@
   "webDir": "www",
   "server": {
     "url": "https://jawali-extra-time-pro.vercel.app/",
-    "cleartext": false
+    "cleartext": false,
+    "errorPath": "offline.html"
   }
 }

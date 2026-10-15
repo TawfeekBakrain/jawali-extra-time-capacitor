@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#182b75">
+<title>Extra Time - دون اتصال</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;display:flex;align-items:center;
+  justify-content:center;padding:24px;background:#f3f5fa;
+  color:#182b75;font-family:Arial,sans-serif;text-align:center
+}
+.card{
+  width:100%;max-width:380px;background:white;padding:32px 24px;
+  border-radius:22px;box-shadow:0 8px 30px #182b7518
+}
+.icon{font-size:54px;margin-bottom:12px}
+h1{font-size:25px;margin:8px 0 14px}
+p{font-size:16px;line-height:1.9;color:#555}
+button{
+  width:100%;border:0;border-radius:12px;padding:15px;
+  margin-top:16px;background:#182b75;color:white;
+  font-size:17px;font-weight:bold;cursor:pointer
+}
+button:active{opacity:.8}
+.brand{margin-top:24px;color:#8a91a5;font-size:13px}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="icon">📶</div>
+  <h1>لا يوجد اتصال بالإنترنت</h1>
+  <p>تعذّر الاتصال بخدمة الوقت الإضافي.<br>
+  تحقق من اتصال الإنترنت ثم أعد المحاولة.</p>
+  <button onclick="retry()">إعادة المحاولة</button>
+  <div class="brand">Extra Time · الوقت الإضافي</div>
+</main>
+<script>
+function retry(){
+  window.location.href='https://jawali-extra-time-pro.vercel.app/';
+}
+window.addEventListener('online',function(){
+  window.location.href='https://jawali-extra-time-pro.vercel.app/';
+});
+</script>
+</body>
+</html>
