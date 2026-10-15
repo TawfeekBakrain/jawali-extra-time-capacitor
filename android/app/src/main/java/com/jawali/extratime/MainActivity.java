@@ -18,7 +18,7 @@ public class MainActivity extends BridgeActivity {
         Bridge bridge = getBridge();
 
         if (bridge == null) {
-            android.util.Log.e(
+            android.util.Log.w(
                 "ExtraTimeWebAuthn",
                 "Capacitor bridge is not ready."
             );
@@ -28,7 +28,7 @@ public class MainActivity extends BridgeActivity {
         WebView webView = bridge.getWebView();
 
         if (webView == null) {
-            android.util.Log.e(
+            android.util.Log.w(
                 "ExtraTimeWebAuthn",
                 "WebView is not available."
             );
@@ -38,43 +38,18 @@ public class MainActivity extends BridgeActivity {
         if (WebViewFeature.isFeatureSupported(
                 WebViewFeature.WEB_AUTHENTICATION)) {
 
-            try {
-                // Stop the initial navigation before configuring WebAuthn.
-                webView.stopLoading();
+            WebSettingsCompat.setWebAuthenticationSupport(
+                webView.getSettings(),
+                WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
+            );
 
-                WebSettingsCompat.setWebAuthenticationSupport(
-                    webView.getSettings(),
-                    WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
-                );
-
-                int support =
-                    WebSettingsCompat.getWebAuthenticationSupport(
-                        webView.getSettings()
-                    );
-
-                android.util.Log.i(
-                    "ExtraTimeWebAuthn",
-                    "WebAuthn support level after configuration: " + support
-                );
-
-                android.util.Log.i(
-                    "ExtraTimeWebAuthn",
-                    "WebAuthn app support configured; reloading page."
-                );
-
-                // Reload so the page can initialize with the new setting.
-                webView.post(() -> webView.reload());
-
-            } catch (Exception e) {
-                android.util.Log.e(
-                    "ExtraTimeWebAuthn",
-                    "Failed to configure WebAuthn support.",
-                    e
-                );
-            }
+            android.util.Log.i(
+                "ExtraTimeWebAuthn",
+                "WebAuthn app support enabled."
+            );
 
         } else {
-            android.util.Log.e(
+            android.util.Log.w(
                 "ExtraTimeWebAuthn",
                 "This WebView does not support WEB_AUTHENTICATION."
             );
