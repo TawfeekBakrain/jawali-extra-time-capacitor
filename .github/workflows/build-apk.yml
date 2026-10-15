@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - restore-biometrics-test
 
 permissions:
   contents: read
