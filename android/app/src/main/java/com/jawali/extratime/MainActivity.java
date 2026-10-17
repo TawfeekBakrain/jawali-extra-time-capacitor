@@ -12,11 +12,16 @@ import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
 
+    private NetworkNoticeManager networkNoticeManager;
+
     private static final String TAG = "ExtraTimeWebAuthn";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        networkNoticeManager = new NetworkNoticeManager(this);
+        networkNoticeManager.start();
 
         Bridge bridge = getBridge();
 
@@ -64,4 +69,14 @@ public class MainActivity extends BridgeActivity {
             Log.e(TAG, "Failed to enable WebAuthn support.", e);
         }
     }
+
+    @Override
+    public void onDestroy() {
+        if (networkNoticeManager != null) {
+            networkNoticeManager.stop();
+        }
+
+        super.onDestroy();
+    }
+
 }
