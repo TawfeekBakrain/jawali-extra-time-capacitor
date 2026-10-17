@@ -151,7 +151,19 @@ public final class DownloadBridge {
 
                 showMessage("تم حفظ الملف في Downloads/Extra Time");
             } catch (Exception e) {
-                showMessage("تعذر حفظ الملف: " + e.getMessage());
+                android.util.Log.e(
+                    "ExtraTimeDownloads",
+                    "Excel/PDF file save failed. Name=" + finalName
+                        + ", MIME=" + finalMime,
+                    e
+                );
+
+                String detail = e.getMessage();
+                if (detail == null || detail.trim().isEmpty()) {
+                    detail = e.getClass().getSimpleName();
+                }
+
+                showMessage("تعذر حفظ الملف: " + detail);
             }
         }).start();
     }
@@ -159,7 +171,18 @@ public final class DownloadBridge {
 
     @JavascriptInterface
     public void printHtmlAsPdf(String title, String html) {
+        android.util.Log.i(
+            "ExtraTimeDownloads",
+            "PDF bridge called. title=" + title
+                + ", htmlLength=" + (html == null ? -1 : html.length())
+        );
+
         if (!isTrustedPage()) {
+            android.util.Log.e(
+                "ExtraTimeDownloads",
+                "PDF rejected: untrusted page. URL="
+                    + (webView == null ? "null" : webView.getUrl())
+            );
             showMessage("الموقع غير مصرح له بالطباعة");
             return;
         }
@@ -194,6 +217,10 @@ public final class DownloadBridge {
                 printWebView.setWebViewClient(new WebViewClient() {
                     @Override
                     public void onPageFinished(WebView view, String url) {
+                        android.util.Log.i(
+                            "ExtraTimeDownloads",
+                            "PDF WebView page finished: " + url
+                        );
                         try {
                             PrintAttributes attributes =
                                 new PrintAttributes.Builder()
@@ -259,6 +286,11 @@ public final class DownloadBridge {
                                     }
                                 };
 
+                            android.util.Log.i(
+                                "ExtraTimeDownloads",
+                                "Opening Android print dialog: " + reportTitle
+                            );
+
                             printManager.print(
                                 reportTitle,
                                 cleanupAdapter,
@@ -286,6 +318,11 @@ public final class DownloadBridge {
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
+                );
+
+                android.util.Log.i(
+                    "ExtraTimeDownloads",
+                    "Loading HTML into PDF print WebView"
                 );
 
                 printWebView.loadDataWithBaseURL(
