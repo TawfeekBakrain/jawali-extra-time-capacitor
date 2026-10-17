@@ -37,6 +37,12 @@ public class MainActivity extends BridgeActivity {
             return;
         }
 
+        // Native file-saving bridge for the trusted Extra Time website.
+        webView.addJavascriptInterface(
+            new DownloadBridge(this, webView),
+            "ExtraTimeDownloads"
+        );
+
         if (!WebViewFeature.isFeatureSupported(
                 WebViewFeature.WEB_AUTHENTICATION)) {
             Log.e(TAG, "WEB_AUTHENTICATION is not supported by this WebView.");
