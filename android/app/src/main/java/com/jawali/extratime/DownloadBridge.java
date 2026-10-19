@@ -45,6 +45,14 @@ public final class DownloadBridge {
 
     @JavascriptInterface
     public void saveBase64File(String filename, String mimeType, String base64) {
+        try {
+            saveBase64FileInternal(filename, mimeType, base64);
+        } catch (Throwable error) {
+            logBridgeError("saveBase64File", error);
+        }
+    }
+
+    private void saveBase64FileInternal(String filename, String mimeType, String base64) {
         if (!isTrustedPage()) {
             return;
         }
@@ -171,6 +179,14 @@ public final class DownloadBridge {
 
     @JavascriptInterface
     public void printHtmlAsPdf(String title, String html) {
+        try {
+            printHtmlAsPdfInternal(title, html);
+        } catch (Throwable error) {
+            logBridgeError("printHtmlAsPdf", error);
+        }
+    }
+
+    private void printHtmlAsPdfInternal(String title, String html) {
         android.util.Log.i(
             "ExtraTimeDownloads",
             "PDF bridge called. title=" + title
@@ -337,6 +353,15 @@ public final class DownloadBridge {
                 showMessage("تعذر بدء طباعة التقرير");
             }
         });
+    }
+
+    private void logBridgeError(String operation, Throwable error) {
+        android.util.Log.e("ExtraTimeDownloads", operation + " failed before completion", error);
+        try {
+            showMessage("تعذر تنفيذ " + operation + ". راجع سجل ExtraTimeDownloads");
+        } catch (Throwable messageError) {
+            android.util.Log.e("ExtraTimeDownloads", "Unable to show error message", messageError);
+        }
     }
 
     private void showMessage(String message) {
