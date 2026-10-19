@@ -356,20 +356,62 @@ public final class DownloadBridge {
     }
 
     private void logBridgeError(String operation, Throwable error) {
-        android.util.Log.e("ExtraTimeDownloads", operation + " failed before completion", error);
-        try {
-            String detail = error.getClass().getSimpleName();
-            String reason = error.getMessage();
-            if (reason != null && !reason.trim().isEmpty()) {
-                detail += ": " + reason;
+        android.util.Log.e(
+            "ExtraTimeDownloads",
+            operation + " failed before completion",
+            error
+        );
+
+        java.io.StringWriter writer = new java.io.StringWriter();
+        java.io.PrintWriter printer = new java.io.PrintWriter(writer);
+        error.printStackTrace(printer);
+        printer.flush();
+
+        String details = operation + "\n"
+            + error.getClass().getName() + ": "
+            + String.valueOf(error.getMessage()) + "\n\n"
+            + writer.toString();
+
+        activity.runOnUiThread(() -> {
+            try {
+                android.widget.TextView text = new android.widget.TextView(activity);
+                text.setText(details);
+                text.setTextIsSelectable(true);
+                text.setTextSize(12);
+                int pad = (int) (16 * activity.getResources()
+                    .getDisplayMetrics().density);
+                text.setPadding(pad, pad, pad, pad);
+
+                android.widget.ScrollView scroll = new android.widget.ScrollView(activity);
+                scroll.addView(text);
+
+                new android.app.AlertDialog.Builder(activity)
+                    .setTitle("تفاصيل خطأ " + operation)
+                    .setView(scroll)
+                    .setPositiveButton("نسخ التفاصيل", (dialog, which) -> {
+                        android.content.ClipboardManager clipboard =
+                            (android.content.ClipboardManager)
+                            activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                        if (clipboard != null) {
+                            clipboard.setPrimaryClip(
+                                android.content.ClipData.newPlainText(
+                                    "ExtraTime error", details
+                                )
+                            );
+                            showMessage("تم نسخ تفاصيل الخطأ");
+                        }
+                    })
+                    .setNegativeButton("إغلاق", null)
+                    .show();
+            } catch (Throwable dialogError) {
+                android.util.Log.e(
+                    "ExtraTimeDownloads",
+                    "Unable to show error details",
+                    dialogError
+                );
+                showMessage("تعذر تنفيذ " + operation + ". راجع سجل الأخطاء");
             }
-            if (detail.length() > 180) {
-                detail = detail.substring(0, 180);
-            }
-            showMessage("تعذر تنفيذ " + operation + " (" + detail + ")");
-        } catch (Throwable messageError) {
-            android.util.Log.e("ExtraTimeDownloads", "Unable to show error message", messageError);
-        }
+        });
     }
 
     private void showMessage(String message) {
