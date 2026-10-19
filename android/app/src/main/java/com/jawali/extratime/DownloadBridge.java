@@ -32,30 +32,62 @@ public final class DownloadBridge {
         this.webView = webView;
     }
 
-    private boolean isTrustedPage() {
-        if (webView == null || webView.getUrl() == null) {
+    private boolean isTrustedPageOnUiThread() {
+        if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
             return false;
         }
 
-        Uri uri = Uri.parse(webView.getUrl());
+        if (webView == null || activity.isFinishing() || activity.isDestroyed()) {
+            return false;
+        }
 
-        return "https".equalsIgnoreCase(uri.getScheme())
-            && "jawali-extra-time-pro.vercel.app".equalsIgnoreCase(uri.getHost());
+        try {
+            String currentUrl = webView.getUrl();
+            if (currentUrl == null) {
+                return false;
+            }
+
+            Uri uri = Uri.parse(currentUrl);
+            return "https".equalsIgnoreCase(uri.getScheme())
+                && "jawali-extra-time-pro.vercel.app"
+                    .equalsIgnoreCase(uri.getHost());
+        } catch (Throwable error) {
+            android.util.Log.e(
+                "ExtraTimeDownloads",
+                "Unable to verify trusted WebView URL",
+                error
+            );
+            return false;
+        }
     }
 
     @JavascriptInterface
     public void saveBase64File(String filename, String mimeType, String base64) {
-        try {
-            saveBase64FileInternal(filename, mimeType, base64);
-        } catch (Throwable error) {
-            logBridgeError("saveBase64File", error);
-        }
+        activity.runOnUiThread(() -> {
+            try {
+                if (!isTrustedPageOnUiThread()) {
+                    android.util.Log.e(
+                        "ExtraTimeDownloads",
+                        "File save rejected: untrusted page"
+                    );
+                    showMessage("الموقع غير مصرح له بحفظ الملفات");
+                    return;
+                }
+
+                new Thread(() -> {
+                    try {
+                        saveBase64FileInternal(filename, mimeType, base64);
+                    } catch (Throwable error) {
+                        logBridgeError("saveBase64File", error);
+                    }
+                }).start();
+            } catch (Throwable error) {
+                logBridgeError("saveBase64File", error);
+            }
+        });
     }
 
     private void saveBase64FileInternal(String filename, String mimeType, String base64) {
-        if (!isTrustedPage()) {
-            return;
-        }
 
         if (filename == null || mimeType == null || base64 == null) {
             showMessage("بيانات الملف غير مكتملة");
@@ -179,29 +211,30 @@ public final class DownloadBridge {
 
     @JavascriptInterface
     public void printHtmlAsPdf(String title, String html) {
-        try {
-            printHtmlAsPdfInternal(title, html);
-        } catch (Throwable error) {
-            logBridgeError("printHtmlAsPdf", error);
-        }
+        activity.runOnUiThread(() -> {
+            try {
+                if (!isTrustedPageOnUiThread()) {
+                    android.util.Log.e(
+                        "ExtraTimeDownloads",
+                        "PDF rejected: untrusted page"
+                    );
+                    showMessage("الموقع غير مصرح له بالطباعة");
+                    return;
+                }
+
+                printHtmlAsPdfInternal(title, html);
+            } catch (Throwable error) {
+                logBridgeError("printHtmlAsPdf", error);
+            }
+        });
     }
 
     private void printHtmlAsPdfInternal(String title, String html) {
         android.util.Log.i(
             "ExtraTimeDownloads",
-            "PDF bridge called. title=" + title
+            "PDF bridge accepted trusted page. title=" + title
                 + ", htmlLength=" + (html == null ? -1 : html.length())
         );
-
-        if (!isTrustedPage()) {
-            android.util.Log.e(
-                "ExtraTimeDownloads",
-                "PDF rejected: untrusted page. URL="
-                    + (webView == null ? "null" : webView.getUrl())
-            );
-            showMessage("الموقع غير مصرح له بالطباعة");
-            return;
-        }
 
         if (html == null || html.isEmpty() || html.length() > 3 * 1024 * 1024) {
             showMessage("حجم تقرير PDF غير صالح");
