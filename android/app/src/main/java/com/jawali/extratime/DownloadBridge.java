@@ -358,7 +358,15 @@ public final class DownloadBridge {
     private void logBridgeError(String operation, Throwable error) {
         android.util.Log.e("ExtraTimeDownloads", operation + " failed before completion", error);
         try {
-            showMessage("تعذر تنفيذ " + operation + ". راجع سجل ExtraTimeDownloads");
+            String detail = error.getClass().getSimpleName();
+            String reason = error.getMessage();
+            if (reason != null && !reason.trim().isEmpty()) {
+                detail += ": " + reason;
+            }
+            if (detail.length() > 180) {
+                detail = detail.substring(0, 180);
+            }
+            showMessage("تعذر تنفيذ " + operation + " (" + detail + ")");
         } catch (Throwable messageError) {
             android.util.Log.e("ExtraTimeDownloads", "Unable to show error message", messageError);
         }
