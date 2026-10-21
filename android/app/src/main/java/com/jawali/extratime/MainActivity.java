@@ -43,6 +43,13 @@ public class MainActivity extends BridgeActivity {
             "ExtraTimeDownloads"
         );
 
+        // Native biometric bridge; JavaScript callbacks are implemented
+        // separately from the existing WebAuthn browser flow.
+        webView.addJavascriptInterface(
+            new NativeBiometricBridge(this, webView),
+            "ExtraTimeNativeBiometric"
+        );
+
         if (!WebViewFeature.isFeatureSupported(
                 WebViewFeature.WEB_AUTHENTICATION)) {
             Log.e(TAG, "WEB_AUTHENTICATION is not supported by this WebView.");
