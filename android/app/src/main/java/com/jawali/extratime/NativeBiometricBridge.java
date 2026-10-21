@@ -1,6 +1,6 @@
 package com.jawali.extratime;
 
-import android.app.Activity;
+import androidx.fragment.app.FragmentActivity;
 import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
@@ -29,11 +29,11 @@ public final class NativeBiometricBridge {
     private static final String TAG = "ExtraTimeNativeBio";
     private static final String KEYSTORE = "AndroidKeyStore";
 
-    private final Activity activity;
+    private final FragmentActivity activity;
     private final WebView webView;
     private final Executor executor;
 
-    public NativeBiometricBridge(Activity activity, WebView webView) {
+    public NativeBiometricBridge(FragmentActivity activity, WebView webView) {
         this.activity = activity;
         this.webView = webView;
         this.executor = ContextCompat.getMainExecutor(activity);
