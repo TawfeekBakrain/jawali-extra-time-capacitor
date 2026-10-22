@@ -84,6 +84,36 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        Bridge bridge = getBridge();
+        if (bridge == null) {
+            Log.w(TAG, "Cannot notify web page: bridge is unavailable.");
+            return;
+        }
+
+        WebView webView = bridge.getWebView();
+        if (webView == null) {
+            Log.w(TAG, "Cannot notify web page: WebView is unavailable.");
+            return;
+        }
+
+        // Give the resumed WebView time to become active before notifying the site.
+        webView.postDelayed(() -> {
+            if (isFinishing() || isDestroyed()) {
+                return;
+            }
+
+            webView.evaluateJavascript(
+                "window.dispatchEvent(new Event('jawaliappresume'));",
+                null
+            );
+            Log.i(TAG, "APP_RESUME_EMPLOYEE_REFRESH: resume event dispatched.");
+        }, 1000);
+    }
+
+    @Override
     public void onDestroy() {
         if (networkNoticeManager != null) {
             networkNoticeManager.stop();
