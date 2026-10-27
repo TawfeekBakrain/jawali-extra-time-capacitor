@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "419631114972",
+    "project_id": "jawali-extratime-ba1f7",
+    "storage_bucket": "jawali-extratime-ba1f7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419631114972:android:1b6f24c8c440fb39ace219",
+        "android_client_info": {
+          "package_name": "com.jawali.extratime"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFkvRQfDcZFmOHjGLwqDjX0V_W7OVoACk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

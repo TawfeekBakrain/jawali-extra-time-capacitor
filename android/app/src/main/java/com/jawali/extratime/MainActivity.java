@@ -50,6 +50,12 @@ public class MainActivity extends BridgeActivity {
             "ExtraTimeNativeBiometric"
         );
 
+        // Native Firebase push notifications bridge.
+        webView.addJavascriptInterface(
+            new NativePushBridge(this, webView),
+            "ExtraTimePush"
+        );
+
         if (!WebViewFeature.isFeatureSupported(
                 WebViewFeature.WEB_AUTHENTICATION)) {
             Log.e(TAG, "WEB_AUTHENTICATION is not supported by this WebView.");
